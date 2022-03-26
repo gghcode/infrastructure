@@ -1,2 +1,2 @@
 ecr_repositories:
-  - name: 'tastie/backend'
+  - name: 'gghcode/reservation-server'
