@@ -1,0 +1,46 @@
+name: Terraform
+
+on: [push]
+
+env:
+  TF_VERSION: 1.1.7
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  plan:
+    runs-on: ubuntu-20.04
+    outputs:
+      GIT_DIFF: ${{ steps.get-diff.outputs.diff }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - uses: technote-space/get-diff-action@v4
+        with:
+          SEPARATOR: ','
+      - name: Get git diff
+        id: get-diff
+        run: |
+          echo "::set-output name=diff::$GIT_DIFF"
+      - name: Plan terraform
+        run: |
+          echo $GIT_DIFF | tr , \\n | xargs -n 1 dirname | uniq | xargs -n 1 bash -c 'cd $0 && echo $0 && terraform init && terraform plan'
+  apply:
+    if: startsWith(github.ref, 'refs/heads/deploy')
+    runs-on: ubuntu-20.04
+    needs: plan
+    environment: apply
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Apply terraform
+        env:
+          GIT_DIFF: ${{ needs.plan.outputs.GIT_DIFF }}
+        run: |
+          echo $GIT_DIFF | tr , \\n | xargs -n 1 dirname | uniq | xargs -n 1 bash -c 'cd $0 && echo $0 && terraform init && terraform apply -auto-approve'
