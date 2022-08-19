@@ -21,6 +21,9 @@
 		"docker-from-docker": "latest",
 		"terraform": "1.2",
 		"git": "latest",
-		"aws-cli": "latest"
+		"aws-cli": "latest",
+		"gghcode/dev-container-features/asdf": {
+			"version": "v0.10.2"
+		}
 	}
 }
