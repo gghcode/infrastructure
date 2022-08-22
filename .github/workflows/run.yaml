@@ -22,7 +22,7 @@ jobs:
         run: |
           JOB_STRATEGY_MATRIX=$(node -e "console.log(process.env.GIT_DIFF.split(',') \
             .filter((f) => f.endsWith('.tf')) \
-            .map((f) => require('path').dirname(f))")
+            .map((f) => require('path').dirname(f)))")
           echo $JOB_STRATEGY_MATRIX
           echo "::set-output name=GIT_DIFF_DIRS::$JOB_STRATEGY_MATRIX"
   Plan:
