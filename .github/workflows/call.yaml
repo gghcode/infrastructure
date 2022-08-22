@@ -1,0 +1,24 @@
+name: Plan Terraform
+
+on: [pull_request]
+
+env:
+  TF_VERSION: 1.1.7
+
+jobs:
+  plan:
+    runs-on: ubuntu-20.04
+    outputs:
+      GIT_DIFF: ${{ steps.get-diff.outputs.diff }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v4
+        with:
+          SEPARATOR: ','
+      - name: Get git diff
+        id: get-diff
+        run: |
+          echo "::set-output name=diff::$GIT_DIFF"
+      - name: Echo Directories
+        run: |
+          echo $GIT_DIFF | tr , \\n | xargs -n 1 dirname | uniq | xargs -n 1 bash -c 'echo $0 && echo $0'
