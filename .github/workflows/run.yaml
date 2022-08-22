@@ -1,4 +1,4 @@
-name: Plan Terraform
+name: Run Terraform
 
 on: [pull_request]
 
@@ -6,7 +6,7 @@ env:
   TF_VERSION: 1.1.7
 
 jobs:
-  prepare:
+  Init:
     runs-on: ubuntu-20.04
     outputs:
       # GIT_DIFF: ${{ steps.get-diff.outputs.diff }}
@@ -16,18 +16,14 @@ jobs:
       - uses: technote-space/get-diff-action@v4
         with:
           SEPARATOR: ','
-      # - name: Get git diff
-      #   id: get-diff
-      #   run: |
-      #     echo "::set-output name=diff::$GIT_DIFF"
-      - name: Echo Directories
+      - name: Export Directories
         run: |
           echo GIT_DIFF_DIRS=$(echo $GIT_DIFF | tr , \\n | xargs -n 1 dirname | uniq | tr '\n' ',') >> $GITHUB_ENV
       - id: generate
         run: |
           JOB_STRATEGY_MATRIX=$(node -e "console.log(JSON.stringify(process.env.GIT_DIFF_DIRS.split(',').filter(c => c)));")
           echo "::set-output name=GIT_DIFF_DIRS::$JOB_STRATEGY_MATRIX"
-  check:
+  Plan:
     needs: prepare
     runs-on: ubuntu-22.04
     strategy:
