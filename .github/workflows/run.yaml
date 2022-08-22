@@ -25,7 +25,7 @@ jobs:
           echo "::set-output name=GIT_DIFF_DIRS::$JOB_STRATEGY_MATRIX"
   Plan:
     needs: Init
-    if: "contains(needs.Init.outputs.GIT_DIFF_DIRS, '[]')"
+    if: false == contains(needs.Init.outputs.GIT_DIFF_DIRS, '[]')
     runs-on: ubuntu-22.04
     strategy:
       matrix:
