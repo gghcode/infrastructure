@@ -1,0 +1,35 @@
+name: Run Terraform
+
+on: [pull_request]
+
+env:
+  TF_VERSION: 1.1.7
+
+jobs:
+  Init:
+    runs-on: ubuntu-22.04
+    outputs:
+      GIT_DIFF_DIRS: ${{ steps.generate.outputs.GIT_DIFF_DIRS }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v4
+        with:
+          SEPARATOR: ','
+      - id: generate
+        run: |
+          JOB_STRATEGY_MATRIX=$(node -e "console.log(process.env.GIT_DIFF.split(',') \
+            .map((f) => f.substring(1, f.length - 1)) \
+            .filter((f) => f.endsWith('.tf')) \
+            .map((f) => require('path').dirname(f)) \
+            .filter((val, idx, self) => self.indexOf(val) === idx))")
+          echo "::set-output name=GIT_DIFF_DIRS::$JOB_STRATEGY_MATRIX"
+  Plan:
+    needs: Init
+    if: false == contains(needs.Init.outputs.GIT_DIFF_DIRS, '[]')
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        job: ${{ fromJson(needs.Init.outputs.GIT_DIFF_DIRS) }}
+      max-parallel: 2
+    steps:
+      - run: echo "This is job ${{ matrix.job }}"
