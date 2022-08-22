@@ -24,6 +24,7 @@ jobs:
             .filter((f) => f.endsWith('.tf')) \
             .map((f) => require('path').dirname(f)) \
             .filter((val, idx, self) => self.indexOf(val) === idx))")
+          echo $JOB_STRATEGY_MATRIX
           echo "::set-output name=GIT_DIFF_DIRS::$JOB_STRATEGY_MATRIX"
   Plan:
     needs: Init
