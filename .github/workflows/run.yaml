@@ -23,7 +23,7 @@ jobs:
           JOB_STRATEGY_MATRIX=$(node -e "console.log(JSON.stringify(process.env.GIT_DIFF_DIRS.split(',').filter(c => c)));")
           echo "::set-output name=GIT_DIFF_DIRS::$JOB_STRATEGY_MATRIX"
   Plan:
-    needs: prepare
+    needs: Init
     runs-on: ubuntu-22.04
     strategy:
       matrix:
