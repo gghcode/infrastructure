@@ -1,0 +1,2 @@
+ecr_repositories:
+  - name: 'gghcode/reservation-server'
