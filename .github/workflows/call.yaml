@@ -22,3 +22,6 @@ jobs:
       - name: Echo Directories
         run: |
           echo $GIT_DIFF | tr , \\n | xargs -n 1 dirname | uniq | xargs -n 1 bash -c 'echo $0 && echo $0'
+      - uses: ./.github/workflows/plan.yaml
+        with:
+          directory_path: mona
