@@ -20,7 +20,11 @@ jobs:
       #     echo GIT_DIFF_DIRS=$(echo $GIT_DIFF | tr , \\n | xargs -n 1 dirname | uniq | tr '\n' ',') >> $GITHUB_ENV
       - id: generate
         run: |
-          JOB_STRATEGY_MATRIX=$(node -e "console.log(process.env.GIT_DIFF.split(','))")
+          JOB_STRATEGY_MATRIX=$(node -e "console.log(process.env.GIT_DIFF.split(',') \
+            .map((f) => f.substring(1, f.length - 1)) \
+            .filter((f) => f.endsWith('.tf')) \
+            .map((f) => require('path').dirname(f)) \
+            .filter((val, idx, self) => self.indexOf(val) === idx))")
           echo $JOB_STRATEGY_MATRIX
           echo "::set-output name=GIT_DIFF_DIRS::$JOB_STRATEGY_MATRIX"
   Plan:
