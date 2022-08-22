@@ -11,7 +11,7 @@ jobs:
     outputs:
       GIT_DIFF_DIRS: ${{ steps.generate.outputs.GIT_DIFF_DIRS }}
     steps:
-      # - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v4
         with:
           SEPARATOR: ','
