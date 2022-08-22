@@ -6,23 +6,32 @@ env:
   TF_VERSION: 1.1.7
 
 jobs:
-  plan:
+  prepare:
     runs-on: ubuntu-20.04
     outputs:
-      GIT_DIFF: ${{ steps.get-diff.outputs.diff }}
+      # GIT_DIFF: ${{ steps.get-diff.outputs.diff }}
+      GIT_DIFF_DIRS: ${{ steps.generate.outputs.GIT_DIFF_DIRS }}
     steps:
       - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v4
         with:
           SEPARATOR: ','
-      - name: Get git diff
-        id: get-diff
-        run: |
-          echo "::set-output name=diff::$GIT_DIFF"
+      # - name: Get git diff
+      #   id: get-diff
+      #   run: |
+      #     echo "::set-output name=diff::$GIT_DIFF"
       - name: Echo Directories
         run: |
-          echo $GIT_DIFF | tr , \\n | xargs -n 1 dirname | uniq | xargs -n 1 bash -c 'echo $0 && echo $0'
-  check:  
-    uses: ./.github/workflows/plan.yaml
-    with:
-      directory_path: mona
+          GIT_DIFF_DIRS=$(echo $GIT_DIFF | tr , \\n | xargs -n 1 dirname | uniq | tr '\n' ',')
+      - id: generate
+        run: |
+          JOB_STRATEGY_MATRIX=$(node -e "console.log(JSON.stringify(process.env.GIT_DIFF_DIRS.split(',').filter(c => c)));")
+          echo "::set-output name=GIT_DIFF_DIRS::$JOB_STRATEGY_MATRIX"
+  check:
+    needs: prepare  
+    strategy:
+      matrix:
+        job: ${{ fromJson(needs.prepare.outputs.GIT_DIFF_DIRS) }}
+      max-parallel: 2
+    steps:
+      - run: echo "This is job ${{ matrix.job }}"
