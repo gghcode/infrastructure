@@ -7,12 +7,11 @@ env:
 
 jobs:
   Init:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
-      # GIT_DIFF: ${{ steps.get-diff.outputs.diff }}
       GIT_DIFF_DIRS: ${{ steps.generate.outputs.GIT_DIFF_DIRS }}
     steps:
-      - uses: actions/checkout@v2
+      # - uses: actions/checkout@v2
       - uses: technote-space/get-diff-action@v4
         with:
           SEPARATOR: ','
