@@ -44,7 +44,8 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ steps.terraform-version.outputs.terraform }}
-        
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      
       - name: Init terraform
         run: terraform init
         working-directory: ${{ matrix.job }}
