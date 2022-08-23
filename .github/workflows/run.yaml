@@ -40,11 +40,14 @@ jobs:
         id: terraform-version
         with:
           path: ${{ matrix.job }}
+        
       - name: Init terraform
         run: terraform init
+        working-directory: ${{ matrix.job }}
 
       - name: Plan terraform
         run: terraform plan
-        
+        working-directory: ${{ matrix.job }}
+
       - name: Print the version
         run: echo "The terraform version was ${{ steps.terraform-version.outputs.terraform }}"
