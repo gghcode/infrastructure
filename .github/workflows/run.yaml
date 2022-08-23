@@ -40,6 +40,10 @@ jobs:
         id: terraform-version
         with:
           path: ${{ matrix.job }}
+      
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ steps.terraform-version.outputs.terraform }}
         
       - name: Init terraform
         run: terraform init
