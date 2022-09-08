@@ -4,6 +4,8 @@ on: [pull_request]
 
 env:
   TF_VERSION: 1.1.7
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
   Init:
@@ -32,4 +34,25 @@ jobs:
         job: ${{ fromJson(needs.Init.outputs.GIT_DIFF_DIRS) }}
       max-parallel: 2
     steps:
-      - run: echo "This is job ${{ matrix.job }}"
+      - uses: actions/checkout@v2
+      - name: Gather terraform-version
+        uses: dflook/terraform-version@v1
+        id: terraform-version
+        with:
+          path: ${{ matrix.job }}
+      
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ steps.terraform-version.outputs.terraform }}
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      
+      - name: Init terraform
+        run: terraform init
+        working-directory: ${{ matrix.job }}
+
+      - name: Plan terraform
+        run: terraform plan
+        working-directory: ${{ matrix.job }}
+
+      - name: Print the version
+        run: echo "The terraform version was ${{ steps.terraform-version.outputs.terraform }}"
